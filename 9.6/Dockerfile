@@ -1,13 +1,11 @@
 # vim:set ft=dockerfile:
 FROM debian:jessie
 
-RUN RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-
 RUN set -ex; \
 	if ! command -v gpg > /dev/null; then \
 		apt-get update; \
 		apt-get install -y --no-install-recommends \
-			git-lfs \
+			curl \
 			gnupg \
 			dirmngr \
 		; \
@@ -16,12 +14,6 @@ RUN set -ex; \
 
 # explicitly set user/group IDs
 RUN groupadd -r postgres --gid=999 && useradd -r -g postgres --uid=999 postgres
-
-# install dockerize
-ENV DOCKERIZE_VERSION v0.5.0
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.10
@@ -36,6 +28,23 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
 	&& apt-get purge -y --auto-remove ca-certificates wget
+
+# install git-lfs
+RUN set -x \
+	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates curl ssh wget \
+	&& curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
+	&& apt-get install -y --no-install-recommends git-lfs \
+	&& rm -rf /var/lib/apt/lists/*
+
+# install jq 1.5
+RUN sudo curl -Lo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
+	&& sudo chmod +x /usr/local/bin/jq
+
+# install dockerize
+ENV DOCKERIZE_VERSION v0.5.0
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 # make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
 RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
