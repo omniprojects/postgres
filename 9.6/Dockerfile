@@ -37,8 +37,8 @@ RUN set -x \
 	&& rm -rf /var/lib/apt/lists/*
 
 # install jq 1.5
-RUN sudo curl -Lo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
-	&& sudo chmod +x /usr/local/bin/jq
+RUN curl -Lo /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
+	&& chmod +x /usr/local/bin/jq
 
 # install dockerize
 ENV DOCKERIZE_VERSION v0.5.0
