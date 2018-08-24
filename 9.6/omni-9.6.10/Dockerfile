@@ -1,10 +1,10 @@
-FROM postgres:9.6
+FROM postgres:9.6.10
 
 # install git-lfs
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates curl ssh wget \
 	&& curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
-	&& apt-get install -y --no-install-recommends git-lfs \
+	&& apt-get install -y --no-install-recommends git-lfs postgresql-plperl-9.6 \
 	&& rm -rf /var/lib/apt/lists/*
 
 # install jq 1.5
